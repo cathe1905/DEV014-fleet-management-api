@@ -1,4 +1,4 @@
-from app.config.db import db
+from app.db.db import db
 from sqlalchemy import Column, Integer, String
 
 class Taxis(db.Model):
