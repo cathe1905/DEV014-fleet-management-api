@@ -1,8 +1,12 @@
+"""This module defines the Trajectories model for storing information about taxi trajectories.
+"""
+from sqlalchemy import Column, Integer, TIMESTAMP, Double
 from app.db.db import db
-from sqlalchemy import Column, Integer, TIMESTAMP, Double 
+
 
 class Trajectories(db.Model):
-
+    """Model class representing taxi trajectories.
+    """
     __tablename__ = 'trajectories'
     id = Column(Integer, primary_key=True)
     taxi_id =  Column(Integer)
@@ -24,6 +28,8 @@ class Trajectories(db.Model):
         return f'Trajectories(id={self.id})'
 
     def to_dict(self):
+        """Return a dictionary representation of the Trajectories object.
+        """
         return {
             'id': self.id,
             'taxi_id': self.taxi_id,
