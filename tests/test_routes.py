@@ -7,6 +7,7 @@ from tests.data_prueba import (
     expected_data_taxis_paged, 
     expected_data_last_trajectories)
 from tests.confest import client
+import pytest
 
 @patch('app.app.select_taxi',
     name='mock_select_taxi',
@@ -66,3 +67,13 @@ def test_mocked_session_last_trajectories(mock_select_last_trajectories, client)
     assert response.status_code == 200
     assert mock_select_last_trajectories.called
     assert response.json == expected_data_last_trajectories
+
+@patch('app.app.post_user',
+    name='mock_post_new_user')
+def test_mock_post_user(mock_post_new_user, client):
+    response= client.post("/users", json={"name": "catherin romero", "email": "prueba@pytest.com", "password": "1234"})    
+    assert response.status_code == 201
+    assert mock_post_new_user.called
+    assert response.get_json == {'id': 1, 'name': 'catherin romero', 'email': 'prueba@pytest.com'}
+
+    # return_value=({'id': 1, 'name': 'catherin romero', 'email': 'prueba@pytest.com'}, None, 201))
