@@ -130,3 +130,21 @@ expected_data_last_trajectories= [
         "taxi_id": 10133
     }
 ]
+
+expected_data_users= [
+    {
+        "email": "omaira.hopper@prueba.xyz",
+        "id": 2,
+        "name": "catherin romero"
+    },
+    {
+        "email": "fernando@gmail.com",
+        "id": 3,
+        "name": "fernando torres"
+    },
+    {
+        "email": "fernando@gmail.com",
+        "id": 5,
+        "name": "catherin torres"
+    }
+]

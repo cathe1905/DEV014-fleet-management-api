@@ -58,25 +58,24 @@ def get_latest_trajectories():
 
 @app.route('/users', methods=['POST'])
 def create_new_user():
-
+    """Endpoint to add a new user into the data base.
+    Returns:
+        json: users data.
+    """
     try:
         data = request.json
-        name = data.get("name", "")
-        email = data.get("email", "")
-        password = data.get("password", "")
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
 
-        new_user, error, status_code = post_user(name, email, password)
+        return post_user(name, email, password)
 
-        if error:
-            return jsonify(error), status_code
-
-        return jsonify({'id': new_user.id, 'name': new_user.name, 'email': new_user.email}), status_code
     except Exception as error:
         return jsonify({'message': 'Internal server error'}), 500
     
 @app.route('/users', methods=['GET'])
 def get_all_user():
-    """Endpoint to retrieve users data.
+    """Endpoint to retrieve all users data.
     Returns:
         json: users data.
     """
@@ -100,13 +99,8 @@ def update_user_patch(uid):
 
     try:
         data= request.json
-        user, error, status_code= update_user(uid, data)
-
-        if error:
-            return jsonify(error), status_code
+        return update_user(uid, data)
         
-        return jsonify({'id': user.id, 'name': user.name, 'email': user.email}), status_code
-
     except Exception as error:
         return jsonify({'message': 'Internal server error'}), 500
     
@@ -117,12 +111,7 @@ def delete_user(uid):
         json: deleted user.
     """
     try:
-        user, error, status_code= delete_user_selected(uid)
-
-        if error:
-            return jsonify(error), status_code
-        
-        return jsonify({'id': user.id, 'name': user.name, 'email': user.email}), status_code
+        return delete_user_selected(uid)
 
     except Exception as error:
         return jsonify({'message': 'Internal server error'}), 500
