@@ -13,6 +13,9 @@ from app.controllers.post_new_user import post_user
 from app.controllers.get_users import select_all_users
 from app.controllers.patch_user import update_user
 from app.controllers.delete_user import delete_user_selected
+from app.controllers.user_controller import generate_token
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from app.config import Config
 
 load_dotenv()
 app = Flask(__name__)
@@ -21,19 +24,39 @@ app.debug = True
 
 db.init_app(app)
 
+app.config.from_object(Config)
+
+jwt = JWTManager(app)
+
+def validation_token():
+    current_user_id = get_jwt_identity()
+    print(f"Current user ID: {current_user_id}")
+    if current_user_id is None:
+        return jsonify({'message': 'You do not have a token'}), 400
+    return None
+
 @app.route('/taxis')
+@jwt_required()
 def get_taxi():
     """Endpoint to retrieve taxi data.
     Returns:
         json: Taxi data.
     """
-    arguments= request.args
+    try:
+        current_user_id = get_jwt_identity()
+        print(f"Current user ID: {current_user_id}")
+        if current_user_id is None:
+            return jsonify({'message': 'You do not have a token'}), 401
 
-    page= arguments.get("page", default=1, type=int)
-    limit= arguments.get("limit", default=10, type=int)
-    query= arguments.get("query", default="", type=str)
-    
-    return jsonify(select_taxi(page, limit, query))
+        arguments= request.args
+
+        page= arguments.get("page", default=1, type=int)
+        limit= arguments.get("limit", default=10, type=int)
+        query= arguments.get("query", default="", type=str)
+        
+        return jsonify(select_taxi(page, limit, query))
+    except Exception as error:
+        return jsonify({'message': 'Internal server error'}), 500
   
 @app.route('/trajectories/<int:taxi_id>')
 def get_trajectories(taxi_id):
@@ -91,27 +114,46 @@ def get_all_user():
         return jsonify({'message': 'Internal server error'}), 500
 
 @app.route('/users/<string:uid>', methods=['PATCH'])
+@jwt_required()
 def update_user_patch(uid):
     """Endpoint to retrieve an updated user.
     Returns:
         json: updated user.
     """
-
     try:
+        validation_token()
         data= request.json
         return update_user(uid, data)
         
-    except Exception as error:
-        return jsonify({'message': 'Internal server error'}), 500
+    except:
+        return jsonify({'message': 'Internal server error, aqui fallo'}), 500
     
 @app.route('/users/<string:uid>', methods=['DELETE'])
+@jwt_required()
 def delete_user(uid):
     """Endpoint to delete an user.
     Returns:
         json: deleted user.
     """
     try:
+        validation_token()
         return delete_user_selected(uid)
+
+    except Exception as error:
+        return jsonify({'message': 'Internal server error'}), 500
+    
+@app.route('/auth/login', methods=['POST'])
+def authentication():
+    """Endpoint to authenticate an user.
+    Returns:
+        json: token and information from user.
+    """
+    try:
+        data = request.json
+        email = data.get("email")
+        password = data.get("password")
+
+        return generate_token(email, password)
 
     except Exception as error:
         return jsonify({'message': 'Internal server error'}), 500
