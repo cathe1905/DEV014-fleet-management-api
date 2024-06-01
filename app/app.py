@@ -28,13 +28,6 @@ app.config.from_object(Config)
 
 jwt = JWTManager(app)
 
-def validation_token():
-    current_user_id = get_jwt_identity()
-    print(f"Current user ID: {current_user_id}")
-    if current_user_id is None:
-        return jsonify({'message': 'You do not have a token'}), 400
-    return None
-
 @app.route('/taxis')
 @jwt_required()
 def get_taxi():
@@ -42,23 +35,16 @@ def get_taxi():
     Returns:
         json: Taxi data.
     """
-    try:
-        current_user_id = get_jwt_identity()
-        print(f"Current user ID: {current_user_id}")
-        if current_user_id is None:
-            return jsonify({'message': 'You do not have a token'}), 401
+    arguments= request.args
 
-        arguments= request.args
-
-        page= arguments.get("page", default=1, type=int)
-        limit= arguments.get("limit", default=10, type=int)
-        query= arguments.get("query", default="", type=str)
-        
-        return jsonify(select_taxi(page, limit, query))
-    except Exception as error:
-        return jsonify({'message': 'Internal server error'}), 500
+    page= arguments.get("page", default=1, type=int)
+    limit= arguments.get("limit", default=10, type=int)
+    query= arguments.get("query", default="", type=str)
+    
+    return jsonify(select_taxi(page, limit, query))
   
 @app.route('/trajectories/<int:taxi_id>')
+@jwt_required()
 def get_trajectories(taxi_id):
     """Endpoint to retrieve trajectory data for a specific taxi.
     Args:
@@ -72,6 +58,7 @@ def get_trajectories(taxi_id):
     return jsonify(select_trajectories(taxi_id, date))
 
 @app.route('/trajectories/latest')
+@jwt_required()
 def get_latest_trajectories():
     """Endpoint to retrieve the latest trajectories for all taxis.
     Returns:
@@ -80,6 +67,7 @@ def get_latest_trajectories():
     return jsonify(select_last_trajectorie_by_taxi())
 
 @app.route('/users', methods=['POST'])
+@jwt_required()
 def create_new_user():
     """Endpoint to add a new user into the data base.
     Returns:
@@ -97,6 +85,7 @@ def create_new_user():
         return jsonify({'message': 'Internal server error'}), 500
     
 @app.route('/users', methods=['GET'])
+@jwt_required()
 def get_all_user():
     """Endpoint to retrieve all users data.
     Returns:
@@ -121,7 +110,6 @@ def update_user_patch(uid):
         json: updated user.
     """
     try:
-        validation_token()
         data= request.json
         return update_user(uid, data)
         
@@ -136,7 +124,6 @@ def delete_user(uid):
         json: deleted user.
     """
     try:
-        validation_token()
         return delete_user_selected(uid)
 
     except Exception as error:
