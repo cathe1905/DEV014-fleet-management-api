@@ -148,3 +148,11 @@ expected_data_users= [
         "name": "catherin torres"
     }
 ]
+
+response_token= {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcxNzEwMjYxNiwianRpIjoiM2QwMGVkZmYtZTZmOS00MTc5LWExZWYtMmVhOTlhZWFlYWY1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImRlbmlzb2xvQGdtYWlsLmNvbSIsIm5iZiI6MTcxNzEwMjYxNiwiY3NyZiI6ImFkYjBkYWI3LWZmN2UtNGQxMS1iNGIzLTk1MjVhYjAwMDJhNSIsImV4cCI6MTcxNzEwNjIxNn0.eQp3l_Wj3FfQJhJLKNXWKFDnli1vmsnHJsX5ez5D_Zg",
+    "user": {
+        "email": "fernandoacuña@email.com",
+        "id": 11
+    }
+}
