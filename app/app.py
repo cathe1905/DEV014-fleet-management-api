@@ -28,6 +28,29 @@ app.config.from_object(Config)
 
 jwt = JWTManager(app)
 
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    """
+    Custom response for requests missing a JWT token.
+    Args:
+        error (str): Error message from the JWT library.
+    Returns:
+        JSON response with a message indicating the absence of the token and a 401 status code.
+    """
+    return jsonify({'message': 'Please include an authentication token in the Authorization header of your request'}), 401
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    """
+    Custom response for requests with an expired JWT token.
+    Args:
+        jwt_header (dict): JWT header data.
+        jwt_payload (dict): JWT payload data.
+    Returns:
+        JSON response with a message indicating the token has expired and a 401 status code.
+    """
+    return jsonify({'message': 'Your authentication token has expired. Please generate a new token and include it in the Authorization header of your request.'}), 401
+
 @app.route('/taxis')
 @jwt_required()
 def get_taxi():
