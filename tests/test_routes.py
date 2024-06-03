@@ -151,12 +151,23 @@ def test_delete_user(mock_delete_user, mock_jwt_required, client):
     `delete_user_selected` function and checks that the correct status code and 
     response are returned when a DELETE request is made to the /users/<uid> endpoint.
     """
-   
     new_user = {'id': '5','name': 'Taylor Swift', 'email': 'fornigth@example.com'}
     response = client.delete('/users/5', json=new_user)
     assert response.status_code == 200
     assert mock_delete_user.called
     assert response.json == {'id': '5','name': 'Taylor Swift', 'email': 'fornigth@example.com'}
+
+@patch('flask_jwt_extended.view_decorators.verify_jwt_in_request')
+@patch('app.app.retrieve_data_xlsx',
+    name='mock_retrieve_data_xlsx')
+def test_mocked_retrieve_data_xlsx(mock_retrieve_data_xlsx, mock_jwt_required, client):
+     
+    """Test for retrieving data from mocked function retrieve_data_xlsx."""
+
+    response= client.get("trajectories/export?taxi_id=8825&date=2008-02-02&email=asesoriasdeseguridad19@gmail.com")   
+    assert response.status_code == 200
+    assert mock_retrieve_data_xlsx.called
+    assert mock_retrieve_data_xlsx.call_args.args == ("8825", "2008-02-02", "asesoriasdeseguridad19@gmail.com") 
 
 
 if __name__ == '__main__':

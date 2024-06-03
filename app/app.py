@@ -3,7 +3,7 @@
 import os
 from flask import jsonify
 from flask import Flask
-from flask import request
+from flask import request, send_file
 from dotenv import load_dotenv
 from app.db.db import db
 from app.controllers.taxi_controller import select_taxi
@@ -14,6 +14,7 @@ from app.controllers.get_users import select_all_users
 from app.controllers.patch_user import update_user
 from app.controllers.delete_user import delete_user_selected
 from app.controllers.user_controller import generate_token
+from app.controllers.data_xlsx_controller import retrieve_data_xlsx
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from app.config import Config
 
@@ -165,6 +166,25 @@ def authentication():
 
         return generate_token(email, password)
 
+    except Exception as error:
+        return jsonify({'message': 'Internal server error'}), 500
+    
+@app.route('/trajectories/export')
+@jwt_required()
+def export_data_taxis():
+    """Endpoint to export taxi data.
+    Returns:
+        xlsx: Taxi data.
+    """
+    try:
+        arguments= request.args
+
+        taxi_id= arguments.get("taxi_id", type=str)
+        date= arguments.get("date", type=str)
+        email= arguments.get("email", type=str)
+        
+        return (retrieve_data_xlsx(taxi_id, date, email))
+    
     except Exception as error:
         return jsonify({'message': 'Internal server error'}), 500
     
