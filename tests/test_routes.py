@@ -87,11 +87,11 @@ def test_mocked_session_last_trajectories(mock_select_last_trajectories, mock_jw
     assert mock_select_last_trajectories.called
     assert response.json == expected_data_last_trajectories
 
-@patch('flask_jwt_extended.view_decorators.verify_jwt_in_request')
+# @patch('flask_jwt_extended.view_decorators.verify_jwt_in_request')
 @patch('app.app.post_user',
        name= 'mock_post_user',
        return_value={'name': 'John Doe', 'email': 'johndoe@example.com', 'password': 'password'})
-def test_create_new_user(mock_post_user, mock_jwt_required, client):
+def test_create_new_user(mock_post_user, client):
      
     """
     Test the creation of a new user.
