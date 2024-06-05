@@ -29,7 +29,7 @@ def update_user(uid, data):
         user = User.query.filter_by(email=uid).first()
     
     if not user:
-        return None, {'message': 'User not found'}, 404
+        return jsonify({'message': 'User not found'}), 404
 
     if 'id' in data:
         user.id= data['id']

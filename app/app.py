@@ -91,7 +91,6 @@ def get_latest_trajectories():
     return jsonify(select_last_trajectorie_by_taxi())
 
 @app.route('/users', methods=['POST'])
-@jwt_required()
 def create_new_user():
     """Endpoint to add a new user into the data base.
     Returns:
@@ -138,7 +137,7 @@ def update_user_patch(uid):
         return update_user(uid, data)
         
     except:
-        return jsonify({'message': 'Internal server error, aqui fallo'}), 500
+        return jsonify({'message': 'Internal server error'}), 500
     
 @app.route('/users/<string:uid>', methods=['DELETE'])
 @jwt_required()
