@@ -1,6 +1,6 @@
 """This module defines the Trajectories model for storing information about taxi trajectories.
 """
-from sqlalchemy import Column, Integer, TIMESTAMP, Double
+from sqlalchemy import Column, Integer, TIMESTAMP, Double, Float
 from app.db.db import db
 
 
@@ -11,8 +11,8 @@ class Trajectories(db.Model):
     id = Column(Integer, primary_key=True)
     taxi_id =  Column(Integer)
     date= Column(TIMESTAMP)
-    latitude= Column(Double)
-    longitude= Column(Double)
+    latitude= Column(Float)
+    longitude= Column(Float)
 
 
     def __init__(self, taxi_id, date, latitude, longitude):

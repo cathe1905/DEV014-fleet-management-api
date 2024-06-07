@@ -1,8 +1,10 @@
 """This module is the controller for the endpoint to select all
 the locations for a specific taxi
 """
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, func
 from app.models.trajectories import Trajectories
+from sqlalchemy.dialects import postgresql
+
 
 def select_trajectories(taxi_id, date):  
     """This function handles the logic for getting all the locations for a 
@@ -11,8 +13,13 @@ def select_trajectories(taxi_id, date):
     - taxi_id: an unique integer that identifies the taxi.
     - date: the date to match with all the locations.
     """
-    trajectories_taxi= Trajectories.query.filter(
-    cast(Trajectories.taxi_id, String).like(f'{taxi_id}%'),
-    cast(Trajectories.date, String).like(f'{date}%')).all()
+    date_str = f'{date}'
+
+    query = Trajectories.query.filter(
+        Trajectories.taxi_id == taxi_id,
+        func.date(Trajectories.date) == date_str
+    )
+    
+    trajectories_taxi = query.all()
 
     return  [trajectory.to_dict() for trajectory in trajectories_taxi]
