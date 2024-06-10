@@ -1,6 +1,6 @@
 Taxi Data API 🚖
 
-This is a Flask-based RESTful API that provides access to taxi and trajectory data. The API allows users to retrieve information about taxis, trajectories, and users, as well as to perform operations such as creating, updating, and deleting user records. 
+This is a Flask-based RESTful API that provides access to taxi and trajectory data. The API allows users to retrieve information about taxis, trajectories, and users, as well as to perform operations such as creating, updating, and deleting user records.  
 Technologies Used 🛠️
 
 Flask: A lightweight Python web framework used for building the API endpoints. SQLAlchemy: An SQL toolkit and Object-Relational Mapping (ORM) library for Python, used for interacting with the database. JWT (JSON Web Tokens): Used for authentication and authorization of users. Pandas: A powerful data manipulation library in Python, used for processing and exporting data to Excel.Python-dotenv: A Python module that reads the key-value pairs from a .env file and sets them as environment variables.
