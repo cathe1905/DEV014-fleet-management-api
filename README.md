@@ -1,21 +1,22 @@
 Taxi Data API 🚖
 
-This is a Flask-based RESTful API that provides access to taxi and trajectory data. The API allows users to retrieve information about taxis, trajectories, and users, as well as to perform operations such as creating, updating, and deleting user records.  
+This is a Flask-based RESTful API that provides access to taxi and trajectory data. The API allows users to retrieve information about taxis, trajectories, and users, as well as to perform operations such as creating, updating, and deleting user records. 
+  
 Technologies Used 🛠️
 
 Flask: A lightweight Python web framework used for building the API endpoints. SQLAlchemy: An SQL toolkit and Object-Relational Mapping (ORM) library for Python, used for interacting with the database. JWT (JSON Web Tokens): Used for authentication and authorization of users. Pandas: A powerful data manipulation library in Python, used for processing and exporting data to Excel.Python-dotenv: A Python module that reads the key-value pairs from a .env file and sets them as environment variables.
-
+  
 API Overview 📋
 
 The API provides the following endpoints:
 
-    /taxis: Retrieve taxi data with optional pagination and filtering by query string.
-    /trajectories/{taxi_id}: Retrieve trajectory data for a specific taxi by providing the taxi ID.
-    /trajectories/latest: Retrieve the latest trajectory data for all taxis.
-    /users: Perform CRUD operations on user records.
-    /auth/login: Authenticate users and generate JWT tokens.
-    /trajectories/export: Export taxi data to an Excel file and send it via email.
-
+/taxis: Retrieve taxi data with optional pagination and filtering by query string.  
+/trajectories/{taxi_id}: Retrieve trajectory data for a specific taxi by providing the taxi ID.  
+/trajectories/latest: Retrieve the latest trajectory data for all taxis.  
+/users: Perform CRUD operations on user records.  
+/auth/login: Authenticate users and generate JWT tokens.  
+/trajectories/export: Export taxi data to an Excel file and send it via email.
+  
 CLI Tool for Data Conversion and Insertion 🛠️
 
     Alongside the RESTful API, the project features a CLI tool using Pandas. This tool streamlines the conversion of text files into DataFrame objects and their insertion into the database. It automates data import tasks for enhanced efficiency.
