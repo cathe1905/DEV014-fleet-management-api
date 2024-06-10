@@ -6,6 +6,7 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 import os
+import zipfile
 from flask import jsonify
 from dotenv import load_dotenv
 import pandas as pd
@@ -32,7 +33,12 @@ def retrieve_data_xlsx(taxi_id, date, email):
 
 
     df1.to_excel("data_trajectories.xlsx", index=False, sheet_name='trajectories_taxi')
-    file_path = "data_trajectories.xlsx"
+
+    with zipfile.ZipFile('data_trajectories.zip', 'w') as zipf:
+        zipf.write('data_trajectories.xlsx')
+
+    file_path = 'data_trajectories.zip'
+    os.remove('data_trajectories.xlsx')
 
     email_sender= "catherinr24@gmail.com"
     email_reciver= email

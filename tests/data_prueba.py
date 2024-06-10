@@ -159,15 +159,3 @@ response_token= {
         "id": 11
     }
 }
-
-expected_data_taxis_CLI = pd.DataFrame({
-    'id': [1, 2],
-    'plate': ['ABC123', 'XYZ789']
-})
-
-expected_data_trajectories_CLI = pd.DataFrame({
-    'taxi_id': [1, 1, 2, 2],
-    'date': ['2023-06-08', '2023-06-08', '2023-06-08', '2023-06-08'],
-    'latitude': [40.7128, 40.7129, 40.7130, 40.7131],
-    'longitude': [-74.0060, -74.0061, -74.0062, -74.0063]
-})

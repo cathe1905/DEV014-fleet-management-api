@@ -3,8 +3,9 @@
 import os
 from flask import jsonify
 from flask import Flask
-from flask import request, send_file
+from flask import request
 from dotenv import load_dotenv
+from flask_jwt_extended import JWTManager, jwt_required
 from app.db.db import db
 from app.controllers.taxi_controller import select_taxi
 from app.controllers.trajectories_controller import select_trajectories
@@ -15,7 +16,6 @@ from app.controllers.patch_user import update_user
 from app.controllers.delete_user import delete_user_selected
 from app.controllers.user_controller import generate_token
 from app.controllers.data_xlsx_controller import retrieve_data_xlsx
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from app.config import Config
 
 load_dotenv()

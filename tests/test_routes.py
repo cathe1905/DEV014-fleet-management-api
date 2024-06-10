@@ -2,18 +2,17 @@
 """
 import unittest
 from unittest.mock import patch, MagicMock, call
+from sqlalchemy import text
+import pandas as pd
 from tests.data_prueba import (
     expected_data_taxis, 
     expected_data_trajectories, 
     expected_data_taxis_paged, 
     expected_data_last_trajectories,
     expected_data_users,
-    response_token, expected_data_taxis_CLI,
-    expected_data_trajectories_CLI)
+    response_token)
 from tests.confest import client
 from app.controllers.upload_gps_data import insert_data_to_db, open_file_and_insert_data
-import pandas as pd
-from sqlalchemy import text
 
 @patch('app.app.generate_token',
         name='mock_auth',
@@ -164,7 +163,6 @@ def test_delete_user(mock_delete_user, mock_jwt_required, client):
 @patch('app.app.retrieve_data_xlsx',
     name='mock_retrieve_data_xlsx')
 def test_mocked_retrieve_data_xlsx(mock_retrieve_data_xlsx, mock_jwt_required, client):
-     
     """Test for retrieving data from mocked function retrieve_data_xlsx."""
 
     response= client.get("trajectories/export?taxi_id=8825&date=2008-02-02&email=asesoriasdeseguridad19@gmail.com")   
@@ -174,6 +172,8 @@ def test_mocked_retrieve_data_xlsx(mock_retrieve_data_xlsx, mock_jwt_required, c
 
 @patch('sqlalchemy.engine.Connection.execute')
 def test_insert_data_to_db_taxis(mock_execute):
+    """Test for inserting data into 'taxis' table."""
+
     connection_mock = MagicMock()
     data = pd.DataFrame({'id': [1, 2], 'plate': ['ABC123', 'DEF456']})
     
@@ -184,7 +184,6 @@ def test_insert_data_to_db_taxis(mock_execute):
         call(text("INSERT INTO taxis (id, plate) VALUES (:id, :plate)"), {"id": 2, "plate": "DEF456"})
     ]
 
-    # Convert expected calls to strings for comparison
     actual_calls = mock_execute.call_args_list
     for expected_call, actual_call in zip(expected_calls, actual_calls):
         assert str(expected_call) == str(actual_call), f"Expected call {expected_call} does not match actual call {actual_call}"
@@ -192,6 +191,8 @@ def test_insert_data_to_db_taxis(mock_execute):
 @patch('pandas.read_csv')
 @patch('app.controllers.upload_gps_data.insert_data_to_db')
 def test_open_file_and_insert_data_taxis(mock_insert_data_to_db, mock_read_csv):
+    """Test for opening a file and inserting data into 'taxis' table."""
+
     connection_mock = MagicMock()
     file_path = 'test_taxis.txt'
     data = pd.DataFrame({'id': [1, 2], 'plate': ['ABC123', 'DEF456']})
@@ -202,8 +203,6 @@ def test_open_file_and_insert_data_taxis(mock_insert_data_to_db, mock_read_csv):
 
     mock_read_csv.assert_called_once_with(file_path, header=None, names=['id', 'plate'], sep=",")
     mock_insert_data_to_db.assert_called_once_with(connection_mock, 'taxis', data)
-
-
-    
+ 
 if __name__ == '__main__':
     unittest.main()

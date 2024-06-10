@@ -1,8 +1,19 @@
+"""
+Insert data into a PostgreSQL database.
+Usage: python insert_data.py folder_path table_type dbname host port username
+Args:
+    folder_path: Path to data directory.
+    table_type: Type of table ('taxis' or 'trajectories').
+    dbname: PostgreSQL database name.
+    host: Database host.
+    port: Database port.
+    username: Database username.
+"""
 import argparse
+import os
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-import os
 
 load_dotenv()
 parser = argparse.ArgumentParser(description="Insert data into the database")
@@ -14,11 +25,13 @@ parser.add_argument('port', help='Number to the port where your DB is listening 
 parser.add_argument('username', help='Your user for conecting to the data base')
 
 def connect_to_DB(database_username, password, database_host, database_port, database_name):
+    """Connects to the PostgreSQL database."""
     connection_url = f'postgresql+psycopg2://{database_username}:{password}@{database_host}:{database_port}/{database_name}'
     engine = create_engine(connection_url)
     return engine.connect()
 
 def insert_data_to_db(connection, table_name, data):
+    """Inserts data into the specified table in the database."""
     with connection.begin() as transaction:
         if table_name == 'taxis':
             for index, row in data.iterrows():
@@ -31,6 +44,7 @@ def insert_data_to_db(connection, table_name, data):
 
 
 def open_file_and_insert_data(connection_name, table_name, file_path):
+    """Reads data from file and inserts into the specified table."""
     try:
         if table_name == "taxis":
             column_names = ['id', 'plate']
