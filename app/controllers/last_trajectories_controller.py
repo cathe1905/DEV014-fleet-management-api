@@ -1,11 +1,11 @@
 """This module is the controller for the endpoint of the last location of each taxi"""
 
-from sqlalchemy import desc
+# from sqlalchemy import desc
 from app.models.taxis import Taxis
 from app.models.trajectories import Trajectories
 from app.db.db import db
 
-def select_last_trajectorie_by_taxi():
+def select_last_trajectorie_by_taxi(page, limit):
     """
     This function create the logic for subquery and query for select the last location of each taxi,
     and returns a list with all the results.
@@ -33,12 +33,14 @@ def select_last_trajectorie_by_taxi():
             (Trajectories.taxi_id == max_date_subquery.c.taxi_id) &
                 (Trajectories.date == max_date_subquery.c.max_date)
         )
-        .order_by(Trajectories.taxi_id, desc(Trajectories.id))
+
         .distinct(Trajectories.taxi_id)
+        .paginate(page=page, per_page=limit)
     )
+    
     reply= []
 
-    for item in query.all():
+    for item in query:
         taxi_id, plate, date, latitude, longitude = item
         last_trajectorie = {
             "taxi_id": taxi_id,

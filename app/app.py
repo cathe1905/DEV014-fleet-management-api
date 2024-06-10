@@ -88,7 +88,11 @@ def get_latest_trajectories():
     Returns:
         json: Latest trajectory data for all taxis.
     """ 
-    return jsonify(select_last_trajectorie_by_taxi())
+    arguments= request.args
+
+    page= arguments.get("page", default=1, type=int)
+    limit= arguments.get("limit", default=10, type=int)
+    return jsonify(select_last_trajectorie_by_taxi(page, limit))
 
 @app.route('/users', methods=['POST'])
 def create_new_user():
