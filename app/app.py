@@ -1,20 +1,12 @@
 """This module defines the endpoints for accessing taxi and trajectory data.
 """
 import os
-from flask import jsonify
-from flask import Flask
-from flask import request
+from flask import jsonify, Flask, request
 from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager, jwt_required
 from app.db.db import db
-from app.controllers.taxi_controller import select_taxi
-from app.controllers.trajectories_controller import select_trajectories
-from app.controllers.last_trajectories_controller import select_last_trajectorie_by_taxi
-from app.controllers.post_new_user import post_user
-from app.controllers.get_users import select_all_users
-from app.controllers.patch_user import update_user
-from app.controllers.delete_user import delete_user_selected
-from app.controllers.user_controller import generate_token
+from app.controllers.taxi_controller import select_taxi, select_trajectories, select_last_trajectorie_by_taxi
+from app.controllers.user_controller import generate_token, post_user, select_all_users, update_user, delete_user_selected
 from app.controllers.data_xlsx_controller import retrieve_data_xlsx
 from app.config import Config
 

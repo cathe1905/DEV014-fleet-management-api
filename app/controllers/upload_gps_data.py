@@ -11,56 +11,72 @@ Args:
 """
 import argparse
 import os
+import asyncio
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+
 
 load_dotenv()
 parser = argparse.ArgumentParser(description="Insert data into the database")
 parser.add_argument('folder_path', help='The path to your field which you want to insert into the DB')
-parser.add_argument('type', help='In what table ypu want to insert the data, taxis o trajectories')
-parser.add_argument('dbname', help='The name of your data base')
-parser.add_argument('host', help="Machine's host, where your data base is runing")
-parser.add_argument('port', help='Number to the port where your DB is listening to the conexions')
-parser.add_argument('username', help='Your user for conecting to the data base')
+parser.add_argument('type', help='In what table you want to insert the data, taxis or trajectories')
+parser.add_argument('dbname', help='The name of your database')
+parser.add_argument('host', help="Machine's host, where your database is running")
+parser.add_argument('port', help='Number of the port where your DB is listening to the connections')
+parser.add_argument('username', help='Your user for connecting to the database')
 
-def connect_to_DB(database_username, password, database_host, database_port, database_name):
-    """Connects to the PostgreSQL database."""
-    connection_url = f'postgresql+psycopg2://{database_username}:{password}@{database_host}:{database_port}/{database_name}'
-    engine = create_engine(connection_url)
-    return engine.connect()
+def get_database_password():
+    """Retrieves the database password from environment variables."""
+    password = os.getenv("PASSWORD_CLI")
+    if not password:
+        raise ValueError("PASSWORD_CLI not found in .env file")
+    return password
 
-def insert_data_to_db(connection, table_name, data):
-    """Inserts data into the specified table in the database."""
-    with connection.begin() as transaction:
-        if table_name == 'taxis':
-            for index, row in data.iterrows():
-                connection.execute(text(f"INSERT INTO {table_name} (id, plate) VALUES (:id, :plate)"),
-                    {"id": row.id, "plate": row.plate})
-        elif table_name == 'trajectories':
-            for index, row in data.iterrows():
-                connection.execute(text(f"INSERT INTO {table_name} (taxi_id, date, latitude, longitude) VALUES (:taxi_id, :date, :latitude, :longitude)"),
-                    {"taxi_id": row.taxi_id, "date": row.date, "latitude": row.latitude, "longitude": row.longitude})
+async def connect_to_db(database_username, password, database_host, database_port, database_name):
+    """Connects to the PostgreSQL database asynchronously."""
+    connection_url = f'postgresql+asyncpg://{database_username}:{password}@{database_host}:{database_port}/{database_name}'
+    engine = create_async_engine(connection_url, echo=True)
+    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    return async_session
 
+async def insert_data_to_db(session, table_name, data):
+    """Inserts data into the specified table in the database asynchronously."""
+    async with session() as session:
+        async with session.begin():
+            if table_name == 'taxis':
+                for index, row in data.iterrows():
+                    await session.execute(text(f"INSERT INTO {table_name} (id, plate) VALUES (:id, :plate)"),
+                        {"id": row.id, "plate": row.plate})
+            elif table_name == 'trajectories':
+                for index, row in data.iterrows():
+                    await session.execute(text(f"INSERT INTO {table_name} (taxi_id, date, latitude, longitude) VALUES (:taxi_id, :date, :latitude, :longitude)"),
+                        {"taxi_id": row.taxi_id, "date": row.date, "latitude": row.latitude, "longitude": row.longitude})
 
-def open_file_and_insert_data(connection_name, table_name, file_path):
-    """Reads data from file and inserts into the specified table."""
+async def open_file_and_insert_data(session, table_name, file_path):
+    """Reads data from file and inserts into the specified table asynchronously."""
     try:
         if table_name == "taxis":
             column_names = ['id', 'plate']
             df = pd.read_csv(file_path, header=None, names=column_names, sep=",")
-            insert_data_to_db(connection_name, 'taxis', df)
+            await insert_data_to_db(session, 'taxis', df)
         elif table_name == "trajectories":
             column_names = ['taxi_id', 'date', 'latitude', 'longitude']
             df = pd.read_csv(file_path, header=None, names=column_names, sep=",")
-            insert_data_to_db(connection_name, 'trajectories', df)
+            await insert_data_to_db(session, 'trajectories', df)
         else:
             print("Unsupported table type. Currently, only 'taxis' and 'trajectories' tables are supported.")
         print(f"File {file_path} processed successfully.")
     except Exception as e:
         print(f"Error processing file {file_path}: {e}")
 
-if __name__ == "__main__":
+async def main():
+    """
+    Main function to parse command line arguments, connect to the database, 
+    and insert data from files into the specified table asynchronously
+    """
     args = parser.parse_args()
     folder_path = args.folder_path
     type_of_table = args.type
@@ -68,24 +84,23 @@ if __name__ == "__main__":
     database_host = args.host
     database_port = args.port
     database_username = args.username
-    database_password = os.getenv("PASSWORD_CLI")
-
-    if not database_password:
-        raise ValueError("PASSWORD_CLI not found in .env file")
+    database_password = get_database_password()
 
     try:
-        connection = connect_to_DB(database_username, database_password, database_host, database_port, database_name)
+        async_session = await connect_to_db(database_username, database_password, database_host, database_port, database_name)
         if os.path.isdir(folder_path):
+            tasks = []
             for filename in os.listdir(folder_path):
                 if filename.endswith('.txt'):
                     file_path = os.path.join(folder_path, filename)
-                    open_file_and_insert_data(connection, type_of_table, file_path)
+                    tasks.append(open_file_and_insert_data(async_session, type_of_table, file_path))
+            await asyncio.gather(*tasks)
         else:
             print(f"Processing single file: {folder_path}")
-            open_file_and_insert_data(connection, type_of_table, folder_path)
-
-        connection.close()
+            await open_file_and_insert_data(async_session, type_of_table, folder_path)
         print("Data inserted successfully.")
-
     except Exception as e:
         print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
